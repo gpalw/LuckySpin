@@ -87,8 +87,6 @@ export const performDraw = async (
     operatorId: string,
     deviceInfo: string | null | undefined,
     idempotencyKey: string,
-    prizeName: string,
-    prizeWinMessage: string
 ) => {
     // 1. 查找此设备对应的激活会话
     // (我们仍然需要会话 ID 来创建 DrawRecord)

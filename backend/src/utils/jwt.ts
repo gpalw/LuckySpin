@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { User, Role } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
@@ -24,9 +24,11 @@ export const signToken = (user: User): string => {
         role: user.role,
     };
 
-    return jwt.sign(payload, JWT_SECRET, {
+    const secret = JWT_SECRET as jwt.Secret;
+
+    return jwt.sign(payload, secret, {
         expiresIn: JWT_EXPIRES_IN,
-    });
+    } as SignOptions);
 };
 
 /**

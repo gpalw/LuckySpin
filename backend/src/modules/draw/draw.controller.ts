@@ -3,6 +3,7 @@ import { prisma } from '../../db/prisma';
 import { activateSessionSchema, drawSchema } from './draw.validation';
 import * as DrawService from './draw.service';
 
+
 /**
  * POST /api/roulettes/:id/activate
  */
@@ -52,14 +53,12 @@ export const performDrawController = async (
         const operatorId = req.user!.id;
         const { idempotencyKey, deviceInfo } = drawSchema.shape.body.parse(req.body);
 
-        const lang = req.query.lang === 'zh' ? 'zh' : 'en';
 
         const result = await DrawService.performDraw(
             rouletteId,
             operatorId,
             deviceInfo,
             idempotencyKey,
-            lang
         );
 
         res.status(200).json(result);
