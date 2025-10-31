@@ -1,5 +1,5 @@
 // frontend/src/pages/UserManagement.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import api from '../lib/api';
 import Modal from '../components/Modal';
 

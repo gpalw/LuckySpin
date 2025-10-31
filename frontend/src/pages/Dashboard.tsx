@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../lib/api'; // 我们的 axios 实例
 import type { Roulette } from '../types'; // 导入我们刚创建的类型
 import Modal from '../components/Modal'; // 导入弹窗外壳
