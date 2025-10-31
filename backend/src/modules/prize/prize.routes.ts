@@ -5,7 +5,7 @@ import { updatePrizeStockController, updatePrizeController, deletePrizeControlle
 
 const router = Router();
 const isAdmin = authorize([Role.ADMIN]);
-
+const isOperatorOrAdmin = authorize([Role.ADMIN, Role.OPERATOR]);
 // --- 奖品管理 (Admin 权限) ---
 
 // 我们的 Spec 要求: PATCH /api/prizes/:id/stock
@@ -13,7 +13,7 @@ const isAdmin = authorize([Role.ADMIN]);
 router.patch(
     '/:id/stock',
     authenticate,
-    isAdmin,
+    isOperatorOrAdmin,
     updatePrizeStockController
 );
 
@@ -21,14 +21,14 @@ router.patch(
 router.patch(
     '/:id',
     authenticate,
-    isAdmin,
+    isOperatorOrAdmin,
     updatePrizeController
 );
 
 router.delete(
     '/:id',
     authenticate,
-    isAdmin,
+    isOperatorOrAdmin,
     deletePrizeController
 );
 

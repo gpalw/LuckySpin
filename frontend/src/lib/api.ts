@@ -37,16 +37,23 @@ api.interceptors.response.use(
     (error) => {
         const isLoginOrUserCreation = error.config.url.includes('/auth/login') || error.config.url.includes('/users');
         // 检查是否是 401 (未授权) 或 403 (禁止) 错误
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        const status = error.response?.status;
+        if (status === 401 || status === 403) {
             if (isLoginOrUserCreation) {
                 return Promise.reject(error);
             }
-            // 1. 清除本地存储中无效的 token
-            localStorage.removeItem('luckySpinToken');
-            // 2. 强制刷新并跳转到登录页 (这是最简单粗暴但有效的方式)
-            window.location.href = '/login';
-            // 3. 提示用户
-            alert('您的登录已过期，请重新登录。');
+            if (status === 401) {
+                localStorage.removeItem('luckySpinToken');
+                alert('Your login has expired, please log in again.');
+                window.location.href = '/login';
+                return Promise.reject(error);
+            }
+
+            if (status === 403) {
+                // 不清除 Token，不强制跳转。只弹窗提示权限不足。
+                alert('Permission denied: You do not have access to perform this action.');
+                return Promise.reject(error);
+            }
         }
         // 将错误继续抛出，以便组件中的 .catch() 也能处理
         return Promise.reject(error);

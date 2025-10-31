@@ -36,7 +36,7 @@ const isOperatorOrAdmin = authorize([Role.ADMIN, Role.OPERATOR]);
 router.get(
     '/',
     authenticate,
-    authorize([Role.ADMIN, Role.OPERATOR]),
+    isOperatorOrAdmin,
     getRoulettesController
 );
 
@@ -45,7 +45,7 @@ router.get(
 router.post(
     '/',
     authenticate,
-    isAdmin,
+    isOperatorOrAdmin,
     createRouletteController
 );
 
@@ -54,7 +54,7 @@ router.post(
 router.patch(
     '/:id/status',
     authenticate,
-    isAdmin,
+    isOperatorOrAdmin,
     updateRouletteStatusController
 );
 
@@ -72,7 +72,7 @@ router.get(
 router.post(
     '/:id/prizes',
     authenticate,
-    isAdmin, // 仅限 Admin
+    isOperatorOrAdmin, // 仅限 Admin
     addPrizeController
 );
 
@@ -106,7 +106,7 @@ router.get(
 router.delete(
     '/:id',
     authenticate,
-    isAdmin, // (必须是 Admin 才能删除)
+    isOperatorOrAdmin, // (必须是 Admin 才能删除)
     deleteRouletteController
 );
 
