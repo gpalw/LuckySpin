@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         Role     @default(ADMIN)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  // relation
+  roulettes    Roulette[]
+  sessions     Session[]
+  auditLogs    AuditLog[]
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+model Roulette {
+  id                 String    @id @default(cuid())
+  ownerId            String
+  name               String
+  theme              String?
+  status             RouletteStatus @default(DRAFT)
+  startAt            DateTime? 
+  endAt              DateTime?
+  maxDrawsPerUser    Int?
+  allowRepeatWins    Boolean   @default(true)
+  isPublic           Boolean   @default(false)
+  publicKey          String?   @unique
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  owner              User      @relation(fields: [ownerId], references: [id])
+  prizes             Prize[]
+  records            DrawRecord[]
+  sessions           Session[]
+  auditLogs          AuditLog[]
+
+  @@index([ownerId, createdAt])
+}
+
+enum RouletteStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ENDED
+  ARCHIVED
+}
+
+model Prize {
+  id         String   @id @default(cuid())
+  rouletteId String
+  weight     Int      // weight，>0
+  stock      Int?     // null = No limit
+  name       String
+  win_message String
+  imageUrl   String?
+  orderIdx   Int      @default(0) // Frontend display order
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  roulette   Roulette @relation(fields: [rouletteId], references: [id])
+
+  records    DrawRecord[]
+
+  @@index([rouletteId])
+  @@index([rouletteId, orderIdx])
+}
+
+model Session {
+  id              String    @id @default(cuid())
+  rouletteId      String
+  operatorId      String
+  state           SessionState @default(ACTIVE)
+  deviceInfo      String?
+  startedAt       DateTime  @default(now())
+  lastHeartbeatAt DateTime  @default(now())
+
+  roulette        Roulette  @relation(fields: [rouletteId], references: [id])
+  operator        User      @relation(fields: [operatorId], references: [id])
+
+  records         DrawRecord[]
+
+  @@index([rouletteId])
+  @@index([rouletteId, state])
+}
+
+enum SessionState {
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
+model DrawRecord {
+  id               String    @id @default(cuid())
+  rouletteId       String
+  prizeId          String?
+  prizeName        String?
+  prizeWinMessage  String?
+  userIdentifier   String?   // Login user ID or anonymous fingerprint
+  ip               String?
+  ua               String?
+  sessionId        String?
+  idempotencyKey   String    @unique
+  signature        String    // HMAC
+  createdAt        DateTime  @default(now())
+  reversedRecordId String?   // Undo the original record pointed to
+  isReversal       Boolean   @default(false)
+
+  roulette         Roulette  @relation(fields: [rouletteId], references: [id])
+  prize            Prize?    @relation(fields: [prizeId], references: [id])
+  session          Session?  @relation(fields: [sessionId], references: [id])
+
+  @@index([rouletteId, createdAt])
+  @@index([sessionId])
+}
+
+model AuditLog {
+  id         String    @id @default(cuid())
+  actorId    String
+  rouletteId String?
+  action     String
+  payload    Json
+  createdAt  DateTime  @default(now())
+
+  actor      User      @relation(fields: [actorId], references: [id])
+  roulette   Roulette? @relation(fields: [rouletteId], references: [id])
+
+  @@index([rouletteId, createdAt])
+}
