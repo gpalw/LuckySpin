@@ -1,24 +1,35 @@
 # 🎯 LuckySpin
 
-A web-based **Prize Wheel System** built with **Node.js** and **React**, designed for real-world event use.  
+> 🧩 Currently in active development — real-world tested in live events.
+
+A web-based **Prize Wheel System** built with **Node.js** and **React**, designed for real-world marketing and event use.  
 Operators can log in via tablet (e.g. iPad) to activate a prize wheel, spin multiple times, and track inventory automatically.  
-Perfect for event management, marketing campaigns, or as a personal demo project.
+The system has been successfully used in **offline promotional events** to manage on-site lucky draws and monitor prize inventory in real time.
+
+---
+
+🌐 **Live Demo**  
+🔗 https://luckyspin.liangwendev.com
+
+- Supports **Google Sign-In**
+- Authorized users can also log in using **username + password**
 
 ---
 
 ## 🚀 Features
 
 - **Secure Login System** – Admin-defined accounts (no public registration)
-- **Multi-User Isolation** – Each user sees only their own wheels and prizes
+- **Google OAuth Login** – Simplified access for verified users
+- **Multi-User Isolation** – Each user manages their own wheels and prizes
 - **Weighted Random Draws** – Server-side controlled probabilities
-- **Atomic Stock Updates** – Inventory automatically decreases with each win
-- **Manual Restock** – Refill prizes anytime without breaking sessions
-- **Multi-language Support** – Prize name and win messages in English & Chinese
-- **Operator Dashboard (iPad Friendly)** – Activate, pause, and spin easily
-- **Audit Log & Fairness** – Signed draw records for verifiable fairness
-- **Session Locking** – Prevent multiple devices from spinning the same wheel
+- **Atomic Stock Updates** – Inventory safely decreases per win
+- **Manual Restock** – Adjust prize stock anytime
+- **Multi-language Support** – English & Chinese prize names and messages
+- **iPad-Friendly Dashboard** – Activate, pause, and spin with ease
+- **Audit Log & Fairness** – Digitally signed draw records
+- **Session Locking** – Prevent multiple devices using one wheel
 - **Idempotent APIs** – Duplicate requests won’t double-deduct stock
-- **Fully Responsive UI** – Optimized for desktop, tablet, and kiosk use
+- **Responsive UI** – Optimized for desktop, tablet, and kiosk screens
 
 ---
 
@@ -29,9 +40,9 @@ Perfect for event management, marketing campaigns, or as a personal demo project
 | **Frontend** | React + Tailwind CSS + Vite |
 | **Backend** | Node.js + Express + Prisma ORM |
 | **Database** | PostgreSQL / MySQL |
-| **Auth** | JWT (Access + Refresh tokens) |
-| **Deployment** | Docker + Nginx + PM2 |
-| **Other** | TypeScript, bcrypt, crypto, Redis (optional) |
+| **Auth** | JWT (Access + Refresh tokens), Google OAuth |
+| **Deployment** | Nginx + PM2 |
+| **Other** | TypeScript, bcrypt, crypto |
 
 ---
 
@@ -41,9 +52,9 @@ Perfect for event management, marketing campaigns, or as a personal demo project
 luckyspin/
 ├── backend/
 │   ├── src/
-│   │   ├── prisma/              # Schema & migrations
-│   │   ├── routes/              # API routes
-│   │   ├── services/            # Core business logic
+│   │   ├── prisma/          # Schema & migrations
+│   │   ├── routes/          # API routes
+│   │   ├── services/        # Core business logic
 │   │   ├── middlewares/
 │   │   └── utils/
 │   ├── .env.example
@@ -57,7 +68,6 @@ luckyspin/
 │   │   └── styles/
 │   ├── package.json
 │   └── README.md
-├── docker-compose.yml
 └── README.md
 ```
 
@@ -65,7 +75,7 @@ luckyspin/
 
 ## ⚙️ Installation & Run
 
-### 1️⃣ Backend Setup
+### 1️⃣ Backend
 ```bash
 cd backend
 cp .env.example .env
@@ -74,7 +84,10 @@ npx prisma migrate dev
 npm run dev
 ```
 
-### 2️⃣ Frontend Setup
+> ⚠️ If you plan to enable third-party login (e.g., Google OAuth),  
+> please complete the relevant fields in your `.env` file.
+
+### 2️⃣ Frontend
 ```bash
 cd frontend
 npm install
@@ -82,61 +95,72 @@ npm run dev
 ```
 
 Visit the app at:  
-**http://localhost:5173**
+👉 **http://localhost:5173**
 
 ---
 
 ## 🧠 How It Works
 
-1. **Admin** creates a wheel and defines prize weights, messages, and stock.
-2. **Operator** logs in via iPad → Activates the wheel → Spins N times.
+1. **Admin** creates a wheel and defines prize weights, messages, and stock.  
+2. **Operator** logs in via tablet → Activates the wheel → Spins N times.  
 3. Each draw:
-   - Calculates result server-side (cryptographically fair).
-   - Deducts prize stock atomically.
-   - Writes draw record + digital signature.
-4. **Admin** can restock or view real-time statistics anytime.
+   - Calculates the result server-side (cryptographically fair)
+   - Deducts prize stock atomically
+   - Records the result with a digital signature  
+4. **Admin** can restock prizes or view statistics anytime.
 
 ---
 
 ## 🧱 API Overview (Simplified)
 
 | Endpoint | Method | Description |
-|-----------|--------|--------------|
+|-----------|--------|-------------|
 | `/api/auth/login` | POST | Login and get tokens |
-| `/api/roulettes` | GET/POST | Create or list wheels |
+| `/api/auth/google` | GET / Callback | Google OAuth login |
+| `/api/roulettes` | GET / POST | Create or list wheels |
 | `/api/roulettes/:id/draw` | POST | Perform one draw |
-| `/api/prizes/:id/stock` | PATCH | Increase or set stock |
-| `/api/records` | GET | View draw records |
+| `/api/prizes/:id/stock` | PATCH | Restock or adjust prize |
+| `/api/records` | GET | View draw history |
 | `/api/audit` | GET | View audit log |
 
 ---
 
 ## 📱 Operator Dashboard (Kiosk Mode)
 
-- **Large Buttons**: Spin Once / Spin N Times / Pause / Resume / Restock
-- **Session Lock**: Only one active device per wheel
-- **Heartbeat**: Keeps the session alive (auto-pause if disconnected)
-- **Offline Safe**: Cached last draw, resync on reconnect
+- **Large Buttons:** Spin Once / Spin N Times / Pause / Resume / Restock  
+- **Session Lock:** One active device per wheel  
+- **Heartbeat:** Keeps the session alive  
+- **Offline Safe:** Cached last draw, resync on reconnect  
 
 ---
 
 ## 🔒 Security Highlights
 
-- All passwords hashed with **bcrypt**
-- All random draws handled **server-side**
-- Draw records digitally signed with **HMAC(secret)**
-- JWT tokens stored in HttpOnly cookies
-- IP + device fingerprint + session tracked per draw
+- Passwords hashed with **bcrypt**
+- All draws handled **server-side**
+- Records digitally signed with **HMAC(secret)**
+- JWT stored in HttpOnly cookies
+- Session & device fingerprints tracked
 - Strict CORS and HTTPS enforcement
 
 ---
 
 ## 📊 Example Use Cases
 
-- 🎡 Event prize draws (expos, fairs, campus events)
-- 🏪 Retail marketing & customer engagement
+- 🎡 Offline event prize draws (fairs, expos, campus)
+- 🏪 Retail store promotions & marketing campaigns
 - 🎁 Internal company lucky draws
-- 💻 Demo project for full-stack interviews
+- 💻 Full-stack demo project for developer portfolios
+
+---
+
+## 🧩 TODO
+
+- [ ] Multi-language UI toggle (EN / 中文)  
+- [ ] Default demo wheel for new users  
+- [ ] UI polish – auto refresh after tab switch, weight explanation, wheel colors  
+- [ ] Functional upgrades – infinite stock option, optional win animations, more OAuth providers  
+- [ ] Send welcome email on first successful login  
 
 ---
 
@@ -150,4 +174,5 @@ MIT License © 2025 Wen Liang
 
 Developed by **Wen Liang**  
 Based in Auckland, New Zealand  
-GitHub: [gpalw](https://github.com/gpalw)
+GitHub: [gpalw](https://github.com/gpalw)  
+Live demo: https://luckyspin.liangwendev.com

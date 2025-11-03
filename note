@@ -1,0 +1,24 @@
+Update Guide
+Update from Git, make sure .env files are updated as per the recent changes.
+
+cd backend
+npm install --production 
+npm install typescript ts-node-dev prisma -D
+npx prisma generate
+npx prisma migrate deploy
+npm i -D typescript ts-node @types/node @types/express @types/jsonwebtoken @types/bcrypt
+
+npm run build
+pm2 reload luckyspin-api 
+pm2 save
+
+
+
+
+cd ../frontend
+npm install --force
+npm run build
+sudo systemctl restart nginx
+
+
+pm2 logs luckyspin-api --lines 10
