@@ -13,14 +13,20 @@ datasource db {
 model User {
   id           String   @id @default(cuid())
   username     String   @unique
-  passwordHash String
-  role         Role     @default(ADMIN)
+  passwordHash String   
+  email     String?     @unique
+  // enum Role
+  role         Role     @default(OPERATOR)
+  // 'google', 'local'
+  provider     String   @default("local")
+  providerId   String?  // google sub
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   // relation
   roulettes    Roulette[]
   sessions     Session[]
   auditLogs    AuditLog[]
+  identities  UserIdentity[]
 }
 
 enum Role {
@@ -141,4 +147,20 @@ model AuditLog {
   roulette   Roulette? @relation(fields: [rouletteId], references: [id])
 
   @@index([rouletteId, createdAt])
+}
+
+enum Provider {
+  LOCAL
+  GOOGLE
+  // TODO FACEBOOK, GITHUB
+}
+
+model UserIdentity {
+  id            String    @id @default(uuid())
+  userId        String
+  provider      Provider
+  providerUserId String
+
+  @@unique([provider, providerUserId])
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

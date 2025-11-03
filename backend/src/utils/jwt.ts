@@ -1,5 +1,6 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { User, Role } from '@prisma/client';
+import { AuthSubject } from '@/types/express/jwt.types';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
@@ -10,18 +11,18 @@ if (!JWT_SECRET) {
 
 export interface JwtPayload {
     id: string;
-    username: string;
+    username: string | undefined;
     role: Role;
 }
 
 /**
  * 签发 JWT
  */
-export const signToken = (user: User): string => {
+export const signToken = (subject: AuthSubject): string => {
     const payload: JwtPayload = {
-        id: user.id,
-        username: user.username,
-        role: user.role,
+        id: subject.id,
+        username: subject.username ?? undefined,
+        role: subject.role,
     };
 
     const secret = JWT_SECRET as jwt.Secret;

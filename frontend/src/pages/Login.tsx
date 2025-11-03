@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api'; // 导入我们创建的 axios 实例
 
+declare global { interface Window { google?: any } }
+
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -42,6 +44,24 @@ const Login = () => {
             }
         } finally {
             setIsLoading(false); // 无论成功失败，都结束加载状态
+        }
+    };
+
+    const handleGoogle = async (credential: string) => {
+        setIsLoading(true);
+        setError('');
+        try {
+            const res = await api.post('/auth/google', { credential }); // 后端从 credential 解析
+            if (res.data?.token) {
+                localStorage.setItem('luckySpinToken', res.data.token);
+                navigate('/');
+            } else {
+                setError('登录失败：服务器未返回 token');
+            }
+        } catch (e: any) {
+            setError(e?.response?.data?.message || 'Google 登录失败');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -105,9 +125,43 @@ const Login = () => {
                         </button>
                     </div>
                 </form>
+
+                <div className="text-center text-xs text-gray-400">OR</div>
+                <div className="flex justify-center">
+                    <GoogleSignInButton onCredential={handleGoogle} />
+                </div>
+
+
             </div>
         </div>
     );
 };
+
+function GoogleSignInButton({ onCredential }: { onCredential: (jwt: string) => void }) {
+    const btnRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (!window.google || !btnRef.current) return;
+
+        window.google.accounts.id.initialize({
+            client_id: import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID, // .env 里配置
+            callback: (resp: any) => {
+                // resp.credential 就是 Google ID Token（发给后端 /auth/google）
+                onCredential(resp.credential);
+            },
+            ux_mode: 'popup',
+        });
+
+        window.google.accounts.id.renderButton(btnRef.current, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text: 'signin_with',
+        });
+    }, []);
+
+    return <div ref={btnRef} />;
+}
+
 
 export default Login;
