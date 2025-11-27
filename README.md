@@ -99,6 +99,14 @@ Visit the app at:
 
 ---
 
+# 启动后端服务 (这会解决 502 Bad Gateway)
+pm2 delete luckyspin-api 
+pm2 start /var/www/luckyspin/backend/dist/server.js --name "luckyspin-api"
+pm2 save
+
+# 重启 Nginx (确保一切都是最新的)
+sudo systemctl restart nginx
+
 ## 🧠 How It Works
 
 1. **Admin** creates a wheel and defines prize weights, messages, and stock.  

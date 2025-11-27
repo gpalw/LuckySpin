@@ -1,16 +1,17 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
+// 仅引入类型
+import type { Request, Response } from 'express';
+
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+
 import { errorHandler } from './middleware/errorHandler';
 
 // 导入路由
 import authRoutes from './modules/auth/auth.routes';
 import rouletteRoutes from './modules/roulette/roulette.routes';
 import prizeRoutes from './modules/prize/prize.routes';
-import { exportDrawRecordsController } from './modules/roulette/roulette.controller';
-import { authenticate, authorize } from './middleware/authMiddleware';
-import { Role } from '@prisma/client';
 import userRoutes from './modules/user/user.routes';
 
 // 创建 Express 实例
@@ -32,7 +33,6 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 // --- API 路由 ---
-// 注意这里的 @/ 别名，它依赖 tsconfig.json 中的 "paths"
 app.use('/api/auth', authRoutes); // 挂载 Auth 路由
 app.use('/api/roulettes', rouletteRoutes); // 挂载轮盘路由
 app.use('/api/prizes', prizeRoutes); // 挂载奖品路由
