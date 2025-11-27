@@ -54,7 +54,7 @@ const RouletteDetail = () => {
                 // 当数据加载后, 设置下拉框的 "初始值"
                 setSelectedStatus(response.data.status);
             } catch (err: any) {
-                setError(err.response?.data?.message || err.message || '加载失败');
+                setError(err.response?.data?.message || err.message || 'Load failed');
             } finally {
                 setIsLoading(false);
             }
@@ -123,10 +123,10 @@ const RouletteDetail = () => {
             // (成功)
             // 1. 更新页面上的 "主" roulette state
             setRoulette(response.data);
-            alert('状态更新成功!');
+            alert('Status updated successfully!');
 
         } catch (err: any) {
-            setError(err.response?.data?.message || err.message || '保存失败');
+            setError(err.response?.data?.message || err.message || 'Save failed');
         } finally {
             setIsSaving(false);
         }
@@ -141,7 +141,7 @@ const RouletteDetail = () => {
 
         // (给用户一个 "反悔" 的机会)
         const isConfirmed = window.confirm(
-            `你确定要永久删除 "${roulette?.name}" 吗？\n这个操作无法撤销。`
+            `Are you sure you want to permanently delete "${roulette?.name}"?\nThis action cannot be undone.`
         );
 
         if (!isConfirmed) {
@@ -158,13 +158,13 @@ const RouletteDetail = () => {
             // --- 去后端添加 DELETE 接口 ---
             await api.delete(`/roulettes/${id}`);
 
-            alert('轮盘删除成功!');
+            alert('Roulette deleted successfully!');
 
             // (删除成功后, 跳转回列表页)
             navigate('/');
 
         } catch (err: any) {
-            setError(err.response?.data?.message || err.message || '删除失败');
+            setError(err.response?.data?.message || err.message || 'Delete failed');
             setIsSaving(false);
         }
     };
@@ -172,7 +172,7 @@ const RouletteDetail = () => {
     // ---  "启动 Kiosk" 函数   ---
     const handleLaunchKiosk = () => {
         if (roulette?.status !== 'ACTIVE') {
-            alert('启动失败: 轮盘必须处于 "ACTIVE" (激活) 状态才能启动。');
+            alert('Launch failed: roulette must be in "ACTIVE" status to start.');
             return;
         }
         if (!roulette.id) return;
@@ -212,7 +212,7 @@ const RouletteDetail = () => {
             await api.patch(`/prizes/${prizeId}/stock`, { stock: currentStock });
         } catch (error) {
             // 4. (悲观回滚) 如果后端失败了，必须回滚前端状态
-            alert('库存同步失败，已回滚到原始状态！请检查库存或网络。');
+            alert('Stock sync failed, rolled back to original state. Please check stock or network.');
             setRoulette({ ...roulette, prizes: originalPrizes }); // 回滚到原始状态
         }
     };
@@ -256,7 +256,7 @@ const RouletteDetail = () => {
             window.URL.revokeObjectURL(url);
 
         } catch (error) {
-            alert('导出失败: 无法下载文件。请确保您有管理员权限。');
+            alert('Export failed: Unable to download file. Please make sure you have admin permission.');
             console.error('Export Error:', error);
         } finally {
             setIsExporting(false);
@@ -268,20 +268,20 @@ const RouletteDetail = () => {
 
     // 7. 处理加载和错误状态
     if (isLoading) {
-        return <div className="p-8">正在加载轮盘信息...</div>;
+        return <div className="p-8">Loading roulette info...</div>;
     }
     if (error) {
         return (
             <div className="p-8 text-red-600">
-                <p>错误: {error}</p>
+                <p>Error: {error}</p>
                 <button onClick={() => window.location.reload()} className="mt-4 text-blue-600">
-                    点此重试
+                    Click here to retry
                 </button>
             </div>
         );
     }
     if (!roulette) {
-        return <div className="p-8">未找到轮盘。</div>;
+        return <div className="p-8">Roulette not found.</div>;
     }
     const prizes = roulette.prizes || [];
     // 8. (核心) 成功渲染
@@ -291,7 +291,7 @@ const RouletteDetail = () => {
             <header className="bg-white shadow-sm">
                 <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <Link to="/" className="text-sm font-medium text-blue-600 hover:text-blue-800">
-                        &larr; 返回轮盘列表
+                        &larr; Back to roulette list
                     </Link>
                     <h1 className="mt-2 text-3xl font-bold text-gray-900">
                         {roulette.name}
@@ -304,12 +304,12 @@ const RouletteDetail = () => {
 
                 {/* 左侧: 奖品列表 */}
                 <div className="md:col-span-2">
-                    <h2 className="text-xl font-semibold mb-4">奖品列表(总权重: {totalWeight})</h2>
+                    <h2 className="text-xl font-semibold mb-4">Prize List (Total Weight: {totalWeight})</h2>
                     <div className="bg-white shadow rounded-lg overflow-hidden">
                         <ul className="divide-y divide-gray-200">
                             {prizes.length === 0 && (
                                 <li className="p-4 text-center text-gray-500">
-                                    这个轮盘还没有奖品。
+                                    This roulette has no prizes yet.
                                 </li>
                             )}
                             {/* --- 奖品列表渲染 --- */}
@@ -322,8 +322,8 @@ const RouletteDetail = () => {
                                         <div>
                                             <p className="font-semibold">{prize.name}</p>
                                             <p className="text-sm text-gray-600">
-                                                库存: {prize.stock === null ? '无限' : prize.stock} |
-                                                权重: {prize.weight}
+                                                Stock: {prize.stock === null ? 'Unlimited' : prize.stock} |
+                                                Weight: {prize.weight}
                                                 {/* (显示百分比) */}
                                                 {prize.weight > 0 && (
                                                     <span className="ml-2 font-medium text-blue-600">
@@ -351,7 +351,7 @@ const RouletteDetail = () => {
                                                 onClick={() => setEditingPrize(prize)}
                                                 className="text-blue-600 hover:text-blue-800 text-sm font-semibold"
                                             >
-                                                编辑
+                                                Edit
                                             </button>
                                         </div>
                                     </li>
@@ -363,13 +363,13 @@ const RouletteDetail = () => {
                         onClick={() => setIsPrizeModalOpen(true)}
                         className="mt-4 w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
                     >
-                        + 添加新奖品
+                        + Add New Prize
                     </button>
                 </div>
 
                 {/* 右侧: 轮盘设置 */}
                 <div className="md:col-span-1">
-                    <h2 className="text-xl font-semibold mb-4">轮盘设置</h2>
+                    <h2 className="text-xl font-semibold mb-4">Roulette Settings</h2>
                     <div className="bg-white shadow rounded-lg p-6 space-y-4">
                         <div>
                             <label htmlFor="spin-factor" className="block text-sm font-medium text-gray-700">
@@ -386,8 +386,8 @@ const RouletteDetail = () => {
                                 className="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                             />
                             <p className="text-xs text-gray-500 mt-1 flex justify-between">
-                                <span>快 (50% 耗时)</span>
-                                <span>慢 (200% 耗时)</span>
+                                <span>Fast (50% duration)</span>
+                                <span>Slow (200% duration)</span>
                             </p>
                         </div>
                         {/* ---  ↓↓↓  (核心) 新增 "启动 Kiosk" 按钮  ↓↓↓  --- */}
@@ -397,29 +397,29 @@ const RouletteDetail = () => {
                                 disabled={isSaving}
                                 className="w-full px-4 py-3 text-lg font-bold text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:bg-gray-400"
                             >
-                                🚀 启动 Kiosk 模式
+                                🚀 Launch Kiosk Mode
                             </button>
                             <p className="text-xs text-gray-500 mt-2 text-center">
-                                (这将在一个新标签页中打开抽奖转盘)
+                                (This will open the spin wheel in a new tab)
                             </p>
                         </div>
 
                         {/* 数据导出 */}
                         <div className="pt-4 border-t">
-                            <h3 className="text-sm font-medium text-gray-700 mb-2">数据导出</h3>
+                            <h3 className="text-sm font-medium text-gray-700 mb-2">Data Export</h3>
                             <button
                                 // ---  ↓↓↓  使用 button 触发 handleExport  ↓↓↓  ---
                                 onClick={handleExport}
                                 disabled={isExporting}
                                 className="w-full text-center px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 disabled:bg-gray-400"
                             >
-                                {isExporting ? '正在导出...' : '下载抽奖记录 (CSV)'}
+                                {isExporting ? 'Exporting...' : 'Download Draw Records (CSV)'}
                             </button>
                         </div>
 
                         <div>
                             <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                                轮盘状态
+                                Roulette Status
                             </label>
                             <select
                                 id="status"
@@ -428,11 +428,11 @@ const RouletteDetail = () => {
                                 disabled={isSaving} // (正在保存或删除时禁用)
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                             >
-                                <option value="DRAFT">草稿 (DRAFT)</option>
-                                <option value="ACTIVE">激活 (ACTIVE)</option>
-                                <option value="PAUSED">暂停 (PAUSED)</option>
-                                <option value="ENDED">结束 (ENDED)</option>
-                                <option value="ARCHIVED">归档 (ARCHIVED)</option>
+                                <option value="DRAFT">Draft (DRAFT)</option>
+                                <option value="ACTIVE">Active (ACTIVE)</option>
+                                <option value="PAUSED">Paused (PAUSED)</option>
+                                <option value="ENDED">Ended (ENDED)</option>
+                                <option value="ARCHIVED">Archived (ARCHIVED)</option>
                             </select>
                         </div>
 
@@ -443,7 +443,7 @@ const RouletteDetail = () => {
                                 disabled={isSaving} // "保存中", 则禁用)
                                 className="w-full px-4 py-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:bg-gray-400"
                             >
-                                {isSaving ? '保存中...' : '保存更改'}
+                                {isSaving ? 'Saving...' : 'Save Changes'}
                             </button>
                         </div>
 
@@ -454,7 +454,7 @@ const RouletteDetail = () => {
                                 disabled={isSaving} // (正在保存或删除时禁用)
                                 className="w-full px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-md hover:bg-red-50 disabled:opacity-50"
                             >
-                                删除这个轮盘
+                                Delete this roulette
                             </button>
                         </div>
                     </div>
@@ -463,7 +463,7 @@ const RouletteDetail = () => {
 
             {/* --- 添加奖品的弹窗 --- */}
             <Modal
-                title="添加新奖品"
+                title="Add New Prize"
                 isOpen={isPrizeModalOpen}
                 onClose={() => setIsPrizeModalOpen(false)}
             >
@@ -478,7 +478,7 @@ const RouletteDetail = () => {
             {/* ---  "编辑" 奖品的弹窗   --- */}
             {/* (只有当 editingPrize 不是 null 时, isOpen 才是 true) */}
             <Modal
-                title="编辑奖品"
+                title="Edit Prize"
                 isOpen={!!editingPrize}
                 onClose={() => setEditingPrize(null)} // (关闭 = 设为 null)
             >

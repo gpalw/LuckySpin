@@ -41,7 +41,7 @@ const Dashboard = () => {
             } catch (err: any) {
                 // (api.ts 拦截器会处理 401/403)
                 // 这里只处理其他错误, e.g., 500
-                setError(err.message || '无法获取轮盘列表');
+                setError(err.message || 'Failed to fetch roulettes list');
             } finally {
                 setIsLoading(false);
             }
@@ -69,13 +69,13 @@ const Dashboard = () => {
             <header className="bg-white shadow-sm">
                 <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
                     <h1 className="text-2xl font-bold text-gray-900">
-                        LuckySpin - 管理后台
+                        LuckySpin - Admin Dashboard
                     </h1>
                     <button
                         onClick={handleLogout}
                         className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
                     >
-                        退出登录
+                        Log Out
                     </button>
                 </div>
             </header>
@@ -83,11 +83,11 @@ const Dashboard = () => {
             {/* 主内容区 */}
             <main className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-6 flex justify-between items-center">
-                    <h2 className="text-xl font-semibold">轮盘列表</h2>
+                    <h2 className="text-xl font-semibold">Roulette List</h2>
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
-                        + 新建轮盘
+                        + Create Roulette
                     </button>
                 </div>
 
@@ -96,22 +96,21 @@ const Dashboard = () => {
                     {/* 1. 加载中... */}
                     {isLoading && (
                         <div className="p-12 text-center text-gray-500">
-                            正在加载...
+                            Loading...
                         </div>
                     )}
 
                     {/* 2. 出错了... */}
                     {error && (
                         <div className="p-12 text-center text-red-600">
-                            加载失败: {error}
+                            Load failed: {error}
                         </div>
                     )}
 
                     {/* 3. 成功, 但列表为空 */}
                     {!isLoading && !error && roulettes.length === 0 && (
                         <div className="p-12 text-center text-gray-500">
-                            没有找到轮盘。请点击 "新建轮盘"
-                            来创建一个。
+                            No roulettes found. Click "Create Roulette" to add one.
                         </div>
                     )}
 
@@ -131,7 +130,7 @@ const Dashboard = () => {
                                         </span>
                                         <p className="mt-2 text-lg font-semibold text-gray-900">{roulette.name}</p>
                                         <p className="text-sm text-gray-500">
-                                            {roulette.prizeCount} 种奖品 |
+                                            {roulette.prizeCount} prizes |
                                             ID: {roulette.id}
                                         </p>
                                     </div>
@@ -140,7 +139,7 @@ const Dashboard = () => {
                                             to={`/roulette/${roulette.id}`}
                                             className="text-blue-600 hover:text-blue-800 font-semibold"
                                         >
-                                            管理
+                                            Manage
                                         </Link>
                                     </div>
                                 </li>
@@ -152,7 +151,7 @@ const Dashboard = () => {
 
             {/* --- 新建轮盘的弹窗 --- */}
             <Modal
-                title="新建轮盘"
+                title="Create Roulette"
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
             >

@@ -31,16 +31,16 @@ const Login = () => {
                 // 2. 跳转到后台主页 ('/' 路径)
                 navigate('/');
             } else {
-                setError('登录失败: 服务器响应无效。');
+                setError('Login failed: invalid server response.');
             }
         } catch (err: any) {
             // 登录失败 (axios 错误)
             if (err.response && err.response.data) {
                 // 显示后端返回的错误 (e.g., "Invalid username or password")
-                setError(err.response.data.message || '登录失败，请检查用户名或密码。');
+                setError(err.response.data.message || 'Login failed, please check your username or password.');
             } else {
                 // 网络错误或后端没开
-                setError(err.message || '发生未知错误 (请确保后端服务器已运行)');
+                setError(err.message || 'Unknown error (please make sure the backend server is running).');
             }
         } finally {
             setIsLoading(false); // 无论成功失败，都结束加载状态
@@ -56,10 +56,10 @@ const Login = () => {
                 localStorage.setItem('luckySpinToken', res.data.token);
                 navigate('/');
             } else {
-                setError('登录失败：服务器未返回 token');
+                setError('Login failed: server did not return token.');
             }
         } catch (e: any) {
-            setError(e?.response?.data?.message || 'Google 登录失败');
+            setError(e?.response?.data?.message || 'Google login failed.');
         } finally {
             setIsLoading(false);
         }
@@ -70,7 +70,7 @@ const Login = () => {
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
                 <h2 className="text-2xl font-bold text-center text-gray-900">
-                    LuckySpin - 登录
+                    LuckySpin - Login
                 </h2>
 
                 {/* 错误提示框, 只有在 error 变量有值时才显示 */}
@@ -86,7 +86,7 @@ const Login = () => {
                             htmlFor="username"
                             className="block text-sm font-medium text-gray-700"
                         >
-                            用户名
+                            Username
                         </label>
                         <input
                             id="username"
@@ -103,7 +103,7 @@ const Login = () => {
                             htmlFor="password"
                             className="block text-sm font-medium text-gray-700"
                         >
-                            密码
+                            Password
                         </label>
                         <input
                             id="password"
@@ -121,7 +121,7 @@ const Login = () => {
                             disabled={isLoading} // 加载时禁用按钮
                             className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400"
                         >
-                            {isLoading ? '登录中...' : '登 录'}
+                            {isLoading ? 'Logging in...' : 'Log In'}
                         </button>
                     </div>
                 </form>

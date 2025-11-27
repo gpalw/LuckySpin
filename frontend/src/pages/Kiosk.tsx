@@ -51,7 +51,7 @@ const Kiosk = () => {
                 if (sessionResponse.data.message.includes('not active')) {
                     const rouletteDetails = await api.get(`/roulettes/${rouletteId}`);
                     setRouletteStatus(rouletteDetails.data.status);
-                    setError('活动未激活或已暂停。请联系管理员。');
+                    setError('Event is not active or has been paused. Please contact an administrator.');
                     return;
                 }
                 setSessionId(sessionResponse.data.sessionId);
@@ -59,7 +59,7 @@ const Kiosk = () => {
                 const prizesResponse = await api.get<Prize[]>(`/roulettes/${rouletteId}/prizes`);
                 setPrizes(prizesResponse.data);
             } catch (err: any) {
-                setError(err.response?.data?.message || err.message || '初始化 Kiosk 失败');
+                setError(err.response?.data?.message || err.message || 'Failed to initialize Kiosk');
             }
         };
         initializeKiosk();
@@ -104,7 +104,7 @@ const Kiosk = () => {
             setMustSpin(true);
 
         } catch (err: any) {
-            setError(err.response?.data?.message || err.message || '抽奖失败');
+            setError(err.response?.data?.message || err.message || 'Draw failed');
         }
     };
 
@@ -153,28 +153,28 @@ const Kiosk = () => {
 
     // --- 渲染 (保持不变) ---
     if (error) {
-        return <div className="flex items-center justify-center min-h-screen text-center text-red-600">错误: {error}</div>;
+        return <div className="flex items-center justify-center min-h-screen text-center text-red-600">Error: {error}</div>;
     }
     if (prizes.length === 0 || wheelData.length === 0) {
-        return <div className="flex items-center justify-center min-h-screen text-center text-gray-500">正在加载 Kiosk...</div>;
+        return <div className="flex items-center justify-center min-h-screen text-center text-gray-500">Loading Kiosk...</div>;
     }
     if (rouletteStatus !== 'ACTIVE') {
         const statusText = {
-            'DRAFT': '活动处于草稿状态，无法启动。',
-            'PAUSED': '活动已暂停，请联系管理员激活。',
-            'ENDED': '活动已结束，无法启动。',
-            'LOADING': '正在验证状态...',
-        }[rouletteStatus] || '活动状态异常，请检查。';
+            'DRAFT': 'Event is in draft status and cannot be started.',
+            'PAUSED': 'Event is paused. Please contact an administrator to activate it.',
+            'ENDED': 'Event has ended and cannot be started.',
+            'LOADING': 'Checking event status...',
+        }[rouletteStatus] || 'Event status is invalid. Please check.';
 
         return (
             <div className="flex items-center justify-center min-h-screen bg-red-100 p-8">
                 <div className="text-center p-12 bg-white rounded-xl shadow-2xl">
                     <h1 className="text-4xl font-bold text-red-700 mb-4">
-                        🛑 无法启动抽奖
+                        🛑 Unable to start draw
                     </h1>
                     <p className="text-xl text-gray-700">{statusText}</p>
                     {/* 仅在 LOADING/ERROR 状态下显示 ID */}
-                    {error && <p className="text-sm text-gray-500 mt-4">错误信息: {error}</p>}
+                    {error && <p className="text-sm text-gray-500 mt-4">Error details: {error}</p>}
                 </div>
             </div>
         );
@@ -195,7 +195,6 @@ const Kiosk = () => {
                 fontSize={14}
                 textOrientation='vertical'
                 textAlignment='center'
-
                 spinDuration={spinFactor} // 设置转动比率
             />
 
@@ -204,7 +203,7 @@ const Kiosk = () => {
                 disabled={mustSpin}
                 className="mt-12 px-12 py-4 text-2xl font-bold text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 disabled:bg-gray-400"
             >
-                {mustSpin ? '旋转中...' : '开始抽奖'}
+                {mustSpin ? 'Spinning...' : 'Start Draw'}
             </button>
 
             <Modal
@@ -218,7 +217,7 @@ const Kiosk = () => {
                         onClick={() => setIsModalOpen(false)}
                         className="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
                     >
-                        确认
+                        Confirm
                     </button>
                 </div>
             </Modal>
